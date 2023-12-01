@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id             String   @id @db.Uuid
+  name           String
+  email          String   @unique
+  password       String
+  role           String   @default("normal")
+  createdAt      DateTime @default(now()) @map("created_at")
+  address        String
+  phoneNumber    Int      @map("phone_number")
+  profilePicture String   @map("profile_picture")
+  description    String
+  lastLogin      String   @map("last_login")
+  status         String
+  preferences    String
+  petsCount      Int      @map("pets_count")
+  Pets           Pets[]
+
+  @@map("users")
+}
+
+model Pets {
+  id                   String                 @id @db.Uuid
+  user                 Users                  @relation(fields: [ownerId], references: [id])
+  ownerId              String                 @map("owner_id") @db.Uuid
+  name                 String
+  species              String
+  breed                String
+  age                  Int
+  size                 Float
+  color                String
+  weight               Float
+  vaccinationStatus    String                 @map("vaccination_status")
+  vaccinationReminders String                 @map("vaccination_reminders")
+  lastVaccinationDate  DateTime               @map("last_vaccination_date")
+  nextVaccinationDate  DateTime               @map("next_vaccination_date")
+  vetContact           String                 @map("vet_contact")
+  medicalNotes         String                 @map("medical_notes")
+  medicalHistory       String                 @map("medical_history")
+  createdAt            DateTime               @map("created_at")
+  updatedAt            DateTime               @map("updated_at")
+  VaccinesAdministered VaccinesAdministered[]
+  PetExams             PetExams[]
+
+  @@map("pets")
+}
+
+model VaccinesAdministered {
+  id               String   @id @db.Uuid
+  vaccine          Vaccines @relation(fields: [vaccineId], references: [id])
+  vaccineId        String   @map("vaccine_id") @db.Uuid
+  pet              Pets     @relation(fields: [petId], references: [id])
+  petId            String   @map("pet_id") @db.Uuid
+  dateAdministered DateTime @map("date_administered")
+  nextDoseDue      DateTime @map("next_dose_due")
+  vetAdministered  String   @map("vet_administered")
+  comments         String
+
+  @@map("vaccines_administered")
+}
+
+model Vaccines {
+  id                   String                 @id @db.Uuid
+  vaccineName          String                 @map("vaccine_name")
+  description          String
+  dosage               String
+  administrationRoute  String                 @map("administration_route")
+  vetRecommendations   String                 @map("vet_recommendations")
+  sideEffects          String                 @map("side_effects")
+  shelfLife            String                 @map("shelf_life")
+  packageInsert        String                 @map("package_insert")
+  VaccinesAdministered VaccinesAdministered[]
+
+  @@map("vaccines")
+}
+
+model PetExams {
+  id            String   @id @db.Uuid
+  pet           Pets     @relation(fields: [petId], references: [id])
+  petId         String   @map("pet_id") @db.Uuid
+  exame         Exams    @relation(fields: [exameId], references: [id])
+  exameId       String   @map("exame_id") @db.Uuid
+  datePerformed DateTime @map("date_performed")
+  vetPerformed  String   @map("vet_performed")
+  contactVet    String   @map("contact_vet")
+  results       String
+  comments      String
+
+  @@map("pet_exams")
+}
+
+model Exams {
+  id                 String     @id @db.Uuid
+  exameName          String     @map("exameName")
+  description        String
+  cost               Float
+  vetRecommendations String     @map("vet_recommendations")
+  frequency          String
+  normalRange        String     @map("normal_range")
+  packageInsert      String     @map("package_insert")
+  PetExams           PetExams[]
+
+  @@map("exams")
+}
