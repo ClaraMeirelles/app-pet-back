@@ -2,40 +2,29 @@ import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './repository/users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { randomUUID } from 'node:crypto';
-import { User } from './model/User';
+import { User, UserModel } from './model/User';
+import { JwtService } from '@nestjs/jwt';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-    constructor(private readonly repository: UsersRepository) { }
+    constructor(
+        private readonly repository: UsersRepository,
+        private jwtService: JwtService
+    ) { }
 
     async getUsers() {
         return await this.repository.getUsers()
     }
 
-    async signup(signupUserDTO: CreateUserDto) {
-        const { name, email, password, role, address, phoneNumber, profilePicture, description, lastLogin, status, preferences, petsCount } = signupUserDTO
+    async findUserByEmail(email: string): Promise<UserModel | undefined> {
+        const user = this.repository.findUserByEmail(email)
 
-        let createdAt = new Date().toISOString();
-    
-        const newUserDB = new User(
-            randomUUID(),
-            name,
-            email,
-            password,
-            role,
-            createdAt,
-            address,
-            phoneNumber,
-            profilePicture,
-            description,
-            lastLogin,
-            status,
-            preferences,
-            petsCount
-        )
-        console.log(newUserDB.userDbModel)
+        return user
+    }
 
-
-        return await this.repository.signup(newUserDB.userModel)
+    async signup(signupUserDTO: Prisma.UsersCreateInput): Promise<boolean | undefined> {
+        await this.repository.signup(signupUserDTO).catch(() => undefined)
+        return true
     }
 }

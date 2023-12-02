@@ -1,32 +1,33 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { CreateUserDto } from "../dto/create-user.dto";
-import { UserDbModel } from "../model/User";
+import { UserModel } from "../model/User";
 import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class UsersRepository {
-    constructor(private readonly prisma: PrismaService){}
+    constructor(private readonly prisma: PrismaService) { }
 
-    async getUsers(){
-        const res = await this.prisma.users.findMany()
-        console.log(res)
-        return res
+    async getUsers(): Promise<UserModel[] | undefined> {
+        return await this.prisma.users.findMany()
     }
 
-    async signup(createUserDto: Prisma.UsersCreateInput){
-        await this.prisma.users.create({data: createUserDto})
+    async findUserByEmail(email: string): Promise<UserModel | undefined> {
+        return await this.prisma.users.findFirst({ where: { email } })
     }
 
-    async login(){
+    async signup(createUserInput: Prisma.UsersCreateInput): Promise<void> {
+        await this.prisma.users.create({ data: createUserInput })
+    }
+
+    async login() {
 
     }
 
-    async updateUser(){
+    async updateUser() {
 
     }
 
-    async deleteUser(){
+    async deleteUser() {
 
     }
 }

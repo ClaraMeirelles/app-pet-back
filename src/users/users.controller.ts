@@ -11,8 +11,8 @@ export class UsersController {
         return await this.usersService.getUsers()
     }
 
-    @Post('')
-    async signup(@Body() signupUserDTO: CreateUserDto){
-        return await this.usersService.signup(signupUserDTO)
-    }
+    // @Post('')
+    // async signup(@Body() signupUserDTO: CreateUserDto){
+    //     return await this.usersService.signup(signupUserDTO)
+    // }
 }

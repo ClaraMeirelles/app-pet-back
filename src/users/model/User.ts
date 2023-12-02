@@ -15,6 +15,23 @@ export interface UserDbModel {
     pets_count: number
 }
 
+export interface UserModel {
+    id: String,
+    name: String,
+    email: String,
+    password: String,
+    role: String,
+    createdAt: Date,
+    address: String,
+    phoneNumber: number,
+    profilePicture: String,
+    description: String,
+    lastLogin: String,
+    status: String,
+    preferences: String,
+    petsCount: number
+}
+
 
 export class User {
     constructor(
