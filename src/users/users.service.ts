@@ -24,7 +24,6 @@ export class UsersService {
     }
 
     async signup(signupUserDTO: Prisma.UsersCreateInput): Promise<boolean | undefined> {
-        await this.repository.signup(signupUserDTO).catch(() => undefined)
-        return true
+        return await this.repository.signup(signupUserDTO).catch(() => undefined).catch((e) => false)
     }
 }

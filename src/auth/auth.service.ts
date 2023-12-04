@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { User, UserDbModel } from 'src/users/model/User';
 import { JwtService } from '@nestjs/jwt';
@@ -19,7 +19,8 @@ export class AuthService {
 
     async hashPassword(password: string): Promise<string> {
         const saltRounds = Number(process.env.BCRYPT_COST)
-        const hashedPassword = await bcrypt.hash(password, saltRounds)
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hashedPassword = await bcrypt.hash(password, salt)
         return hashedPassword
     }
 
@@ -28,18 +29,18 @@ export class AuthService {
     }
 
     async signup(signupUserInput: CreateUserDto) {
-        const userExist: UserDbModel = await this.usersService.findUserByEmail(signupUserInput.email).catch(() => undefined)
+        const userExist: UserDbModel = await this.usersService.findUserByEmail(signupUserInput.email).catch(() => undefined);
         if (userExist) {
-            throw new Error("Email exist")
-        }
+            throw new BadRequestException("Something bad happened", { cause: new Error(), description: "Email or Password invalid" });
+        };
 
-        const { name, email, password, role, address, phoneNumber, profilePicture, description, lastLogin, status, preferences, petsCount } = signupUserInput
+        const { name, email, password, role, address, phoneNumber, profilePicture, description, lastLogin, status, preferences, petsCount } = signupUserInput;
 
         let createdAt = new Date().toISOString();
 
-        const id = randomUUID()
+        const id = randomUUID();
 
-        const hashedPassword = await this.hashPassword(password)
+        const hashedPassword = await this.hashPassword(password);
 
         const newUserDB = new User(
             id,
@@ -56,16 +57,14 @@ export class AuthService {
             status,
             preferences,
             petsCount
-        )
-        // console.log(newUserDB.userDbModel)
+        );
 
         const userCreated = await this.usersService.signup(newUserDB.userModel)
 
-        if (!userCreated) {
-            throw new Error("Error created user")
-        }
+        if (!userCreated) throw new Error("Internal error");
 
         const payload = { sub: id, email, role };
+
         return {
             acessToken: this.jwtService.sign(payload, { secret: process.env.JWT_SECRET }),
         }
@@ -74,22 +73,16 @@ export class AuthService {
     async login(email: string, pass: string): Promise<LoginOutput> {
         const user: UserDbModel = await this.usersService.findUserByEmail(email).catch(() => undefined);
 
-        if (!user) {
-            throw Error("Email or Password invalid")
-        }
+        if (!user) throw new HttpException("Email or Password invalid", HttpStatus.FORBIDDEN);
 
-        if (user?.password !== pass) {
-            throw new UnauthorizedException();
-        }
+        const isUser = await this.comparePasswords(pass, user.password);
+
+        if (!isUser) throw new HttpException("Email or Password invalid", HttpStatus.FORBIDDEN);
 
         const payload = { sub: user.id, email: user.email, role: user.role };
 
         return {
             acessToken: this.jwtService.sign(payload, { secret: process.env.JWT_SECRET }),
-        }
+        };
     }
 }
-
-// return {
-//     access_token: await this.jwtService.signAsync(payload),
-// };
