@@ -17,6 +17,6 @@ export class AuthController {
     @UsePipes(ValidationPipe)
     @Post('login')
     login(@Body() signInDto: Record<string, any>) {
-        return this.authService.login(signInDto.email, signInDto.password);
+        return this.authService.login(signInDto.email, signInDto.password)
     }
 }
