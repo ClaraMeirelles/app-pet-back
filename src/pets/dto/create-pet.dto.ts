@@ -42,12 +42,12 @@ export class CreatePetDto {
     vaccinationReminders: string;
 
     @IsNotEmpty({ message: 'Last vaccination date is empty' })
-    @IsDate({ message: 'Invalid last vaccination date' })
-    lastVaccinationDate: Date;
+    @IsString({ message: 'Invalid last vaccination date' })
+    lastVaccinationDate: string;
 
     @IsNotEmpty({ message: 'Next vaccination date is empty' })
-    @IsDate({ message: 'Invalid next vaccination date' })
-    nextVaccinationDate: Date;
+    @IsString({ message: 'Invalid next vaccination date' })
+    nextVaccinationDate: string;
 
     @IsNotEmpty({ message: 'Vet contact is empty' })
     @IsString({ message: 'Vet contact must be a string' })

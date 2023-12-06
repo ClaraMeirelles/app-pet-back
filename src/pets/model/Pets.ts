@@ -231,7 +231,7 @@ export class Pet {
             medicalNotes: this._medicalNotes,
             medicalHistory: this._medicalHistory,
             createdAt: this._createdAt,
-            updatedAt: this._updatedAt,
+            updatedAt: this._updatedAt
         };
     }
 }
