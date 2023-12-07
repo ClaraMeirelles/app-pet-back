@@ -16,4 +16,8 @@ export class PetsRepository {
     async registerPet(createPetInput: PetModel): Promise<void> {
         await this.prisma.pets.create({data: createPetInput})
     }
+
+    async findPetById(id: string){
+        return await this.prisma.pets.findFirst({where: {id}})
+    }
 }

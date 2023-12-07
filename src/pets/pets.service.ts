@@ -17,7 +17,7 @@ export class PetsService {
         return await this.repository.getPets()
     }
 
-    async registePet(signupPetInput: CreatePetDto) {
+    async registerPet(signupPetInput: CreatePetDto) {
 
         const id = randomUUID();
 
@@ -49,5 +49,10 @@ export class PetsService {
         )
 
         return await this.repository.registerPet(newPet.petModel)
+    }
+
+    async updatePet(id: string){
+        const pet = await this.repository.findPetById(id)
+        console.log(pet)
     }
 }
