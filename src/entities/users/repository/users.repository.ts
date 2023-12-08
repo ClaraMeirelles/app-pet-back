@@ -5,10 +5,16 @@ import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class UsersRepository {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService
+    ) { }
 
     async getUsers(): Promise<UserModel[] | undefined> {
         return await this.prisma.users.findMany()
+    }
+
+    async findUserById(id: string): Promise<UserModel | undefined> {
+        return await this.prisma.users.findFirst({ where: { id } })
     }
 
     async findUserByEmail(email: string): Promise<UserModel | undefined> {

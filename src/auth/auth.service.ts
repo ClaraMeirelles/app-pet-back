@@ -1,12 +1,12 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { User, UserDbModel } from 'src/users/model/User';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dtos/signup.dto';
 import { LoginOutput } from './dtos/login.dto';
 import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
+import { UsersService } from 'src/entities/users/users.service';
+import { User, UserDbModel } from 'src/entities/users/model/User';
 
 dotenv.config();
 
