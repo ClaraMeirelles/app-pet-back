@@ -3,6 +3,7 @@ import { PetsService } from './pets.service';
 import { request } from 'http';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { UpdatePetDto } from './dto/update-pet.dto';
 
 @Controller('pets')
 export class PetsController {
@@ -23,9 +24,10 @@ export class PetsController {
         return this.petsService.registerPet(registerPet)
     }
 
+    @UsePipes(ValidationPipe)
     @UseGuards(AuthGuard)
     @Put(':id')
-    updatePet(@Param('id') id: string) {
-        return this.petsService.updatePet(id)
+    updatePet(@Param('id') id: string, @Body() updatePet: UpdatePetDto) {
+        return this.petsService.updatePet(id, updatePet)
     }
 }

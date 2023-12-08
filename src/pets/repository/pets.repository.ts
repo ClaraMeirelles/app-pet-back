@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { PetModel } from "../model/Pets";
+import { Pet, PetModel } from "../model/Pets";
 
 @Injectable()
 export class PetsRepository {
@@ -14,10 +14,14 @@ export class PetsRepository {
     }
 
     async registerPet(createPetInput: PetModel): Promise<void> {
-        await this.prisma.pets.create({data: createPetInput})
+        await this.prisma.pets.create({ data: createPetInput })
     }
 
-    async findPetById(id: string){
-        return await this.prisma.pets.findFirst({where: {id}})
+    async findPetById(id: string): Promise<PetModel | undefined> {
+        return await this.prisma.pets.findFirst({ where: { id } })
+    }
+
+    async updatePet(updatePet: PetModel): Promise<void> {
+        await this.prisma.pets.update({where: {id: updatePet.id}, data: updatePet})
     }
 }

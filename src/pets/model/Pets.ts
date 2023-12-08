@@ -10,13 +10,13 @@ export interface PetDbModel {
     weight: number;
     vaccination_status: string;
     vaccination_reminders: string;
-    last_vaccination_date: string;
-    next_vaccination_date: string;
+    last_vaccination_date: string | Date;
+    next_vaccination_date: string | Date;
     vet_contact: string;
     medical_notes: string;
     medical_history: string;
-    created_at: string;
-    updated_at: string;
+    created_at: string | Date;
+    updated_at: string | Date;
 }
 
 export interface PetModel {
@@ -31,17 +31,17 @@ export interface PetModel {
     weight: number;
     vaccinationStatus: string;
     vaccinationReminders: string;
-    lastVaccinationDate: string;
-    nextVaccinationDate: string;
+    lastVaccinationDate: string | Date;
+    nextVaccinationDate: string | Date;
     vetContact: string;
     medicalNotes: string;
     medicalHistory: string;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: string | Date;
+    updatedAt: string | Date;
 }
 
 export class Pet {
-    
+
     constructor(
         private _id: string,
         private _ownerId: string,
@@ -54,13 +54,13 @@ export class Pet {
         private _weight: number,
         private _vaccinationStatus: string,
         private _vaccinationReminders: string,
-        private _lastVaccinationDate: string,
-        private _nextVaccinationDate: string,
+        private _lastVaccinationDate: string | Date,
+        private _nextVaccinationDate: string | Date,
         private _vetContact: string,
         private _medicalNotes: string,
         private _medicalHistory: string,
-        private _createdAt: string,
-        private _updatedAt: string,
+        private _createdAt: string | Date,
+        private _updatedAt: string | Date,
     ) { }
 
     public get id(): string {
@@ -140,14 +140,14 @@ export class Pet {
         this._vaccinationReminders = value;
     }
 
-    public get lastVaccinationDate(): string {
+    public get lastVaccinationDate(): string | Date {
         return this._lastVaccinationDate;
     }
     public set lastVaccinationDate(value: string) {
         this._lastVaccinationDate = value;
     }
 
-    public get nextVaccinationDate(): string {
+    public get nextVaccinationDate(): string | Date {
         return this._nextVaccinationDate;
     }
     public set nextVaccinationDate(value: string) {
@@ -175,14 +175,14 @@ export class Pet {
         this._medicalHistory = value;
     }
 
-    public get createdAt(): string {
+    public get createdAt(): string | Date {
         return this._createdAt;
     }
     public set createdAt(value: string) {
         this._createdAt = value;
     }
 
-    public get updatedAt(): string {
+    public get updatedAt(): string | Date {
         return this._updatedAt;
     }
     public set updatedAt(value: string) {
