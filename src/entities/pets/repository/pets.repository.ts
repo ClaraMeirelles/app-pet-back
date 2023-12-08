@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { Pet, PetModel } from "../model/Pets";
+import { VaccineAdministeredModel } from "../model/VaccinesAdministered";
 
 @Injectable()
 export class PetsRepository {
@@ -23,5 +24,9 @@ export class PetsRepository {
 
     async updatePet(updatePet: PetModel): Promise<void> {
         await this.prisma.pets.update({where: {id: updatePet.id}, data: updatePet})
+    }
+
+    async getVaccines(petId: string): Promise<VaccineAdministeredModel[] | []>{
+        return this.prisma.vaccinesAdministered.findMany({where: {petId}})
     }
 }

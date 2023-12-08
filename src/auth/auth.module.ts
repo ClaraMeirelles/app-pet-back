@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UsersModule } from '../users/users.module';
+
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 
 import * as dotenv from 'dotenv';
+import { UsersModule } from 'src/entities/users/users.module';
 dotenv.config();
 
 @Module({

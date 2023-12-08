@@ -1,11 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PetsRepository } from './repository/pets.repository';
-import { Pet } from './model/Pets';
+import { Pet, PetModel } from './model/Pets';
 import { randomUUID } from 'crypto';
 import { CreatePetDto } from './dto/create-pet.dto';
-import { UsersRepository } from 'src/users/repository/users.repository';
-import { UsersService } from 'src/users/users.service';
 import { UpdatePetDto } from './dto/update-pet.dto';
+import { UsersService } from '../users/users.service';
+import { GetVaccinesAdministeredDto } from './dto/get-vaccines-administered.dto';
+import { VaccineAdministeredModel } from './model/VaccinesAdministered';
 
 @Injectable()
 export class PetsService {
@@ -14,11 +15,11 @@ export class PetsService {
         private readonly usersService: UsersService
     ) { }
 
-    async getPets() {
+    async getPets(): Promise<PetModel[] | []> {
         return await this.repository.getPets()
     }
 
-    async registerPet(signupPetInput: CreatePetDto) {
+    async registerPet(signupPetInput: CreatePetDto): Promise<void> {
 
         const id = randomUUID();
 
@@ -52,7 +53,7 @@ export class PetsService {
         return await this.repository.registerPet(newPet.petModel)
     }
 
-    async updatePet(id: string, updatePet: UpdatePetDto) {
+    async updatePet(id: string, updatePet: UpdatePetDto): Promise<void> {
         const petDb = await this.repository.findPetById(id)
 
         if (!petDb) throw new HttpException("Pet not found", HttpStatus.NOT_FOUND);
@@ -96,6 +97,14 @@ export class PetsService {
 
         pet.updatedAt = new Date().toISOString();
 
-        return await this.repository.updatePet(pet.petModel)
+        await this.repository.updatePet(pet.petModel)
+    }
+
+    async getVaccines(dto: GetVaccinesAdministeredDto): Promise<VaccineAdministeredModel[] | []> {
+        const petExist = await this.repository.findPetById(dto.id)
+
+        if (!petExist) throw new HttpException("Pet not found", HttpStatus.NOT_FOUND);
+
+        return await this.repository.getVaccines(dto.id)
     }
 }

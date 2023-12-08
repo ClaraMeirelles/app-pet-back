@@ -4,6 +4,7 @@ import { request } from 'http';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UpdatePetDto } from './dto/update-pet.dto';
+import { GetVaccinesAdministeredDto } from './dto/get-vaccines-administered.dto';
 
 @Controller('pets')
 export class PetsController {
@@ -29,5 +30,12 @@ export class PetsController {
     @Put(':id')
     updatePet(@Param('id') id: string, @Body() updatePet: UpdatePetDto) {
         return this.petsService.updatePet(id, updatePet)
+    }
+
+    
+    @UseGuards(AuthGuard)
+    @Get(':id')
+    getVaccines(@Param(ValidationPipe) id: GetVaccinesAdministeredDto) {
+        return this.petsService.getVaccines(id)
     }
 }
