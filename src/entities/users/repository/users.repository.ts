@@ -21,8 +21,8 @@ export class UsersRepository {
         return await this.prisma.users.findFirst({ where: { email } })
     }
 
-    async signup(createUserInput: Prisma.UsersCreateInput): Promise<void> {
-        await this.prisma.users.create({ data: createUserInput })
+    async signup(createUserInput: Prisma.UsersCreateInput): Promise<UserModel | undefined> {
+        return await this.prisma.users.create({ data: createUserInput })
     }
 
     async login() {

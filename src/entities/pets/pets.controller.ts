@@ -1,10 +1,12 @@
 import { Body, Controller, Get, Post, Put, Request, Param, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { PetsService } from './pets.service';
-import { request } from 'http';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { UpdatePetDto } from './dto/update-pet.dto';
+import { UpdatePetDto, UpdatePetIdDto } from './dto/update-pet.dto';
 import { GetVaccinesAdministeredDto } from './dto/get-vaccines-administered.dto';
+import { VaccineAdministered } from './model/VaccinesAdministered';
+import { CreateVaccinesAdministeredDto } from './dto/register-vaccines-administered.dto';
+import { CreatePetExamDto } from './dto/register-pet-exam.dto';
 
 @Controller('pets')
 export class PetsController {
@@ -12,30 +14,47 @@ export class PetsController {
         private readonly petsService: PetsService
     ) { }
 
-    @UseGuards(AuthGuard)
+    // Pegar todos os pets
+    @UseGuards(AuthGuard) // rota protegida
     @Get('')
     async getPets(@Request() request) {
         return await this.petsService.getPets()
     }
 
+    // Registrar um novo pet
     @UsePipes(ValidationPipe)
-    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard) // rota protegida
     @Post('')
     registerPet(@Body() registerPet: CreatePetDto) {
         return this.petsService.registerPet(registerPet)
     }
 
+    // Atualizar o pet no banco de dados
     @UsePipes(ValidationPipe)
-    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard) // rota protegida
     @Put(':id')
-    updatePet(@Param('id') id: string, @Body() updatePet: UpdatePetDto) {
+    updatePet(@Param(ValidationPipe) id: UpdatePetIdDto, @Body() updatePet: UpdatePetDto) {
         return this.petsService.updatePet(id, updatePet)
     }
 
-    
-    @UseGuards(AuthGuard)
+    // Pegar vacinas aplicadas a um pet
+    @UseGuards(AuthGuard) // rota protegida
     @Get(':id')
     getVaccines(@Param(ValidationPipe) id: GetVaccinesAdministeredDto) {
-        return this.petsService.getVaccines(id)
+        return this.petsService.getVaccinesAdministered(id)
+    }
+
+    @UsePipes(ValidationPipe)
+    @UseGuards(AuthGuard) // rota protegida
+    @Post('vaccines')
+    registerVaccinesAdiministered(@Body() VaccineAdministered: CreateVaccinesAdministeredDto) {
+        return this.petsService.registerVaccinesAdiministered(VaccineAdministered)
+    }
+
+    @UsePipes(ValidationPipe)
+    @UseGuards(AuthGuard) // rota protegida
+    @Post('exams')
+    registerPetExam(@Body() petExam: CreatePetExamDto) {
+        return this.petsService.registerPetExam(petExam)
     }
 }

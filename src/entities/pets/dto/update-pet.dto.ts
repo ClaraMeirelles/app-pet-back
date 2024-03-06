@@ -1,4 +1,9 @@
-import { IsString, IsUUID, IsInt, IsNumber, IsDate, IsOptional } from "class-validator";
+import { IsString, IsUUID, IsInt, IsNumber, IsDate, IsOptional, IsNotEmpty } from "class-validator";
+
+export class UpdatePetIdDto {
+    @IsUUID('all', { message: 'Invalid pet ID format' })
+    id: string;
+}
 
 export class UpdatePetDto {
     @IsOptional()

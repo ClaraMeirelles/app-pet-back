@@ -61,6 +61,8 @@ export class AuthService {
 
         const userCreated = await this.usersService.signup(newUserDB.userModel)
 
+        console.log(userCreated)
+
         if (!userCreated) throw new Error("Internal error");
 
         const payload = { sub: id, email, role };

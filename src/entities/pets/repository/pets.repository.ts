@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { Pet, PetModel } from "../model/Pets";
 import { VaccineAdministeredModel } from "../model/VaccinesAdministered";
+import { PetExamModel } from "../model/PetExam";
 
 @Injectable()
 export class PetsRepository {
@@ -23,10 +24,25 @@ export class PetsRepository {
     }
 
     async updatePet(updatePet: PetModel): Promise<void> {
-        await this.prisma.pets.update({where: {id: updatePet.id}, data: updatePet})
+        await this.prisma.pets.update({ where: { id: updatePet.id }, data: updatePet })
     }
 
-    async getVaccines(petId: string): Promise<VaccineAdministeredModel[] | []>{
-        return this.prisma.vaccinesAdministered.findMany({where: {petId}})
+    async findVaccineById(vaccineId: string): Promise<any[] | []> {
+        return this.prisma.vaccines.findMany({ where: { id: vaccineId } })
+    }
+
+    async registerVaccinesAdministered(newVaccineAdministered: VaccineAdministeredModel): Promise<void> {
+        await this.prisma.vaccinesAdministered.create({ data: newVaccineAdministered })
+    }
+
+    async getVaccinesAdministered(petId: string): Promise<VaccineAdministeredModel[] | []> {
+        return this.prisma.pets.findUnique({
+            where: { id: petId },
+            include: { VaccinesAdministered: true },
+        }).then(pet => pet?.VaccinesAdministered || []);
+    }
+
+    async registerPetExamm(newPetExam: PetExamModel): Promise<void>{
+        await this.prisma.petExams.create({data: newPetExam})
     }
 }
