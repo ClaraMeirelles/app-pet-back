@@ -167,3 +167,6 @@ dist
 
 
 *.http
+
+# Prisma
+/prisma/migrations

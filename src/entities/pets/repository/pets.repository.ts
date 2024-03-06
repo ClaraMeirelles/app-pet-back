@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { Pet, PetModel } from "../model/Pets";
+import { PetModel } from "../model/Pets";
 import { VaccineAdministeredModel } from "../model/VaccinesAdministered";
 import { PetExamModel } from "../model/PetExam";
+import { WeightHistoryModel } from "../model/WeightPet";
 
 @Injectable()
 export class PetsRepository {
@@ -36,13 +36,23 @@ export class PetsRepository {
     }
 
     async getVaccinesAdministered(petId: string): Promise<VaccineAdministeredModel[] | []> {
-        return this.prisma.pets.findUnique({
+        return await this.prisma.pets.findUnique({
             where: { id: petId },
             include: { VaccinesAdministered: true },
         }).then(pet => pet?.VaccinesAdministered || []);
     }
 
-    async registerPetExamm(newPetExam: PetExamModel): Promise<void>{
-        await this.prisma.petExams.create({data: newPetExam})
+    async registerPetExamm(newPetExam: PetExamModel): Promise<void> {
+        await this.prisma.petExams.create({ data: newPetExam })
+    }
+
+    async registerWeightPet(newWeightPet: WeightHistoryModel): Promise<void> {
+        await this.prisma.weightHistory.create({ data: newWeightPet })
+    }
+
+    async getWeightHistory(id: string): Promise<WeightHistoryModel[]> {
+        return await this.prisma.weightHistory.findMany({
+            where: { petId: id }
+        })
     }
 }

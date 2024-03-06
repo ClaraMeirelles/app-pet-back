@@ -52,6 +52,7 @@ model Pets {
   updatedAt            DateTime               @map("updated_at")
   VaccinesAdministered VaccinesAdministered[]
   PetExams             PetExams[]
+  WeightHistory        WeightHistory[]
 
   @@map("pets")
 }
@@ -102,7 +103,7 @@ model PetExams {
 
 model Exams {
   id                 String     @id @db.Uuid
-  exameName          String     @map("exameName")
+  exameName          String     @map("exame_name")
   description        String
   cost               Float
   vetRecommendations String     @map("vet_recommendations")
@@ -112,4 +113,14 @@ model Exams {
   PetExams           PetExams[]
 
   @@map("exams")
+}
+
+model WeightHistory {
+  id     String   @id @db.Uuid
+  pet    Pets     @relation(fields: [petId], references: [id])
+  petId  String   @map("pet_id") @db.Uuid
+  weight Float
+  date   DateTime
+
+  @@map("weight_history")
 }

@@ -10,6 +10,8 @@ import { PetVaccinesAdministered, VaccineAdministered, VaccineAdministeredModel 
 import { CreateVaccinesAdministeredDto } from './dto/register-vaccines-administered.dto';
 import { CreatePetExamDto } from './dto/register-pet-exam.dto';
 import { PetExam } from './model/PetExam';
+import { CreateWeightHistoryDto, WeightPetIdDto } from './dto/register-weight-pet.dto';
+import { Weight, WeightHistoryModel } from './model/WeightPet';
 
 @Injectable()
 export class PetsService {
@@ -25,12 +27,15 @@ export class PetsService {
     async registerPet(signupPetInput: CreatePetDto): Promise<void> {
 
         const id = randomUUID();
+        const idWeight = randomUUID();
 
         const { ownerId, name, species, breed, age, size, color, weight, vaccinationStatus, vaccinationReminders, lastVaccinationDate, nextVaccinationDate, vetContact, medicalNotes, medicalHistory } = signupPetInput
 
         const user = await this.usersService.findUserById(ownerId)
 
         if (!user) throw new HttpException("User not found", HttpStatus.FORBIDDEN);
+
+        const currentDate = new Date().toISOString()
 
         const newPet = new Pet(
             id,
@@ -49,15 +54,25 @@ export class PetsService {
             vetContact,
             medicalNotes,
             medicalHistory,
-            new Date().toISOString(),
-            new Date().toISOString()
+            currentDate,
+            currentDate
         )
 
-        return await this.repository.registerPet(newPet.petModel)
+        const newWeight = new Weight(
+            idWeight,
+            id,
+            weight,
+            currentDate
+        )
+
+        await this.repository.registerPet(newPet.petModel)
+        await this.repository.registerWeightPet(newWeight.weightHistoryModel)
     }
 
     async updatePet({ id }: UpdatePetIdDto, updatePet: UpdatePetDto): Promise<void> {
         if (!id) throw new HttpException("Id invalid", HttpStatus.BAD_REQUEST);
+
+        const { name, ownerId, species, breed, age, size, color, weight, vaccinationStatus, vaccinationReminders, lastVaccinationDate, nextVaccinationDate, vetContact, medicalNotes, medicalHistory } = updatePet
 
         const petDb = await this.repository.findPetById(id)
 
@@ -84,23 +99,35 @@ export class PetsService {
             petDb.updatedAt
         )
 
-        pet.name = updatePet.name ?? pet.name;
-        pet.ownerId = updatePet.ownerId ?? pet.ownerId;
-        pet.species = updatePet.species ?? pet.species;
-        pet.breed = updatePet.breed ?? pet.breed;
-        pet.age = updatePet.age ?? pet.age;
-        pet.size = updatePet.size ?? pet.size;
-        pet.color = updatePet.color ?? pet.color;
-        pet.weight = updatePet.weight ?? pet.weight;
-        pet.vaccinationStatus = updatePet.vaccinationStatus ?? pet.vaccinationStatus;
-        pet.vaccinationReminders = updatePet.vaccinationReminders ?? pet.vaccinationReminders;
-        pet.lastVaccinationDate = updatePet.lastVaccinationDate ?? pet.lastVaccinationDate as string;
-        pet.nextVaccinationDate = updatePet.nextVaccinationDate ?? pet.nextVaccinationDate as string;
-        pet.vetContact = updatePet.vetContact ?? pet.vetContact;
-        pet.medicalNotes = updatePet.medicalNotes ?? pet.medicalNotes;
-        pet.medicalHistory = updatePet.medicalHistory ?? pet.medicalHistory;
+        pet.name = name ?? pet.name;
+        pet.ownerId = ownerId ?? pet.ownerId;
+        pet.species = species ?? pet.species;
+        pet.breed = breed ?? pet.breed;
+        pet.age = age ?? pet.age;
+        pet.size = size ?? pet.size;
+        pet.color = color ?? pet.color;
+        pet.weight = weight ?? pet.weight;
+        pet.vaccinationStatus = vaccinationStatus ?? pet.vaccinationStatus;
+        pet.vaccinationReminders = vaccinationReminders ?? pet.vaccinationReminders;
+        pet.lastVaccinationDate = lastVaccinationDate ?? pet.lastVaccinationDate as string;
+        pet.nextVaccinationDate = nextVaccinationDate ?? pet.nextVaccinationDate as string;
+        pet.vetContact = vetContact ?? pet.vetContact;
+        pet.medicalNotes = medicalNotes ?? pet.medicalNotes;
+        pet.medicalHistory = medicalHistory ?? pet.medicalHistory;
 
         pet.updatedAt = new Date().toISOString();
+
+        if (weight) {
+            const idWeight = randomUUID();
+            const newWeight = new Weight(
+                idWeight,
+                id,
+                weight,
+                new Date().toISOString()
+            )
+
+            await this.repository.registerWeightPet(newWeight.weightHistoryModel)
+        }
 
         await this.repository.updatePet(pet.petModel)
     }
@@ -157,7 +184,7 @@ export class PetsService {
         const petExist = await this.repository.findPetById(petId)
 
         if (!petExist) throw new HttpException("Pet id not found", HttpStatus.NOT_FOUND);
-        
+
         const petExam = new PetExam(
             id,
             petId,
@@ -170,5 +197,36 @@ export class PetsService {
         )
 
         await this.repository.registerPetExamm(petExam.petExamModel)
+    }
+
+    async registerWeightPet(idPet: WeightPetIdDto, weightPet: CreateWeightHistoryDto) {
+        const { weight } = weightPet
+        const id = randomUUID();
+        const petId = idPet.toString()
+
+        const petExist = await this.repository.findPetById(petId)
+
+        if (!petExist) throw new HttpException("Pet id not found", HttpStatus.NOT_FOUND);
+
+        const newWeight = new Weight(
+            id,
+            petId,
+            weight,
+            new Date().toISOString()
+        )
+
+        await this.repository.registerWeightPet(newWeight.weightHistoryModel)
+    }
+
+    async getWeightHistory({ id }: WeightPetIdDto): Promise<WeightHistoryModel[]> {
+        const petId = id.toString()
+
+        const petExist = await this.repository.findPetById(petId)
+
+        if (!petExist) throw new HttpException("Pet id not found", HttpStatus.NOT_FOUND);
+
+        const res = await this.repository.getWeightHistory(petId)
+
+        return res
     }
 }

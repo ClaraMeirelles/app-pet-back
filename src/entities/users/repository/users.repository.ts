@@ -25,14 +25,6 @@ export class UsersRepository {
         return await this.prisma.users.create({ data: createUserInput })
     }
 
-    async login() {
-
-    }
-
-    async updateUser() {
-
-    }
-
     async deleteUser() {
 
     }
