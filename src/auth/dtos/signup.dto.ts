@@ -6,8 +6,12 @@ enum UserRole {
 }
 
 export class CreateUserDto {
-  @IsNotEmpty({ message: 'Name is empty' })
-  @IsString({ message: 'Name must be a string' })
+  @IsNotEmpty({
+    message: 'Name is empty'
+  })
+  @IsString({
+    message: 'Name must be a string'
+  })
   name: string;
 
   @IsNotEmpty({ message: 'Email is empty' })

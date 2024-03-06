@@ -1,11 +1,13 @@
+import { PetDbModel, PetModel } from "./Pets";
+
 export interface VaccineAdministeredDbModel {
     id: string;
     vaccineId: string;
     petId: string;
-    dateAdministered: string; // Representação da data em formato de string, você pode ajustar conforme necessário
-    nextDoseDue: string; // Representação da data em formato de string, você pode ajustar conforme necessário
+    dateAdministered: string; // Representação da data em formato de string
+    nextDoseDue: string; // Representação da data em formato de string
     vetAdministered: string;
-    comments: string;
+    comments: string | undefined;
 }
 
 export interface VaccineAdministeredModel {
@@ -15,7 +17,11 @@ export interface VaccineAdministeredModel {
     dateAdministered: Date; // Tipo Date para representar datas
     nextDoseDue: Date; // Tipo Date para representar datas
     vetAdministered: string;
-    comments: string;
+    comments: string | undefined;
+}
+
+export interface PetVaccinesAdministered {
+    vaccinesAdministered: VaccineAdministeredModel[];
 }
 
 export class VaccineAdministered {
@@ -26,7 +32,7 @@ export class VaccineAdministered {
         private _dateAdministered: Date | string, // Pode ser do tipo Date ou string, dependendo da representação desejada
         private _nextDoseDue: Date | string, // Pode ser do tipo Date ou string, dependendo da representação desejada
         private _vetAdministered: string,
-        private _comments: string,
+        private _comments: string | undefined,
     ) { }
 
     public get id(): string {

@@ -3,10 +3,13 @@ import { PetsRepository } from './repository/pets.repository';
 import { Pet, PetModel } from './model/Pets';
 import { randomUUID } from 'crypto';
 import { CreatePetDto } from './dto/create-pet.dto';
-import { UpdatePetDto } from './dto/update-pet.dto';
+import { UpdatePetDto, UpdatePetIdDto } from './dto/update-pet.dto';
 import { UsersService } from '../users/users.service';
 import { GetVaccinesAdministeredDto } from './dto/get-vaccines-administered.dto';
-import { VaccineAdministeredModel } from './model/VaccinesAdministered';
+import { PetVaccinesAdministered, VaccineAdministered, VaccineAdministeredModel } from './model/VaccinesAdministered';
+import { CreateVaccinesAdministeredDto } from './dto/register-vaccines-administered.dto';
+import { CreatePetExamDto } from './dto/register-pet-exam.dto';
+import { PetExam } from './model/PetExam';
 
 @Injectable()
 export class PetsService {
@@ -53,7 +56,9 @@ export class PetsService {
         return await this.repository.registerPet(newPet.petModel)
     }
 
-    async updatePet(id: string, updatePet: UpdatePetDto): Promise<void> {
+    async updatePet({ id }: UpdatePetIdDto, updatePet: UpdatePetDto): Promise<void> {
+        if (!id) throw new HttpException("Id invalid", HttpStatus.BAD_REQUEST);
+
         const petDb = await this.repository.findPetById(id)
 
         if (!petDb) throw new HttpException("Pet not found", HttpStatus.NOT_FOUND);
@@ -100,11 +105,70 @@ export class PetsService {
         await this.repository.updatePet(pet.petModel)
     }
 
-    async getVaccines(dto: GetVaccinesAdministeredDto): Promise<VaccineAdministeredModel[] | []> {
-        const petExist = await this.repository.findPetById(dto.id)
+    async getVaccinesAdministered({ id }: GetVaccinesAdministeredDto): Promise<PetVaccinesAdministered | []> {
+        const pet = await this.repository.findPetById(id)
 
-        if (!petExist) throw new HttpException("Pet not found", HttpStatus.NOT_FOUND);
+        if (!pet) throw new HttpException("Pet not found", HttpStatus.NOT_FOUND);
 
-        return await this.repository.getVaccines(dto.id)
+        const vaccines = await this.repository.getVaccinesAdministered(id)
+
+        const res = {
+            vaccinesAdministered: vaccines
+        }
+
+        return res
+    }
+
+    async registerVaccinesAdiministered(dto: CreateVaccinesAdministeredDto): Promise<void> {
+        const { vaccineId, petId, dateAdministered, nextDoseDue, vetAdministered, comments } = dto
+
+        const id = randomUUID();
+
+        const [vaccineExist] = await this.repository.findVaccineById(vaccineId)
+
+        if (!vaccineExist) throw new HttpException("Vaccine id not found", HttpStatus.NOT_FOUND);
+
+        const petExist = await this.repository.findPetById(petId)
+
+        if (!petExist) throw new HttpException("Pet id not found", HttpStatus.NOT_FOUND);
+
+        const vaccineAdministered = new VaccineAdministered(
+            id,
+            vaccineId,
+            petId,
+            dateAdministered,
+            nextDoseDue,
+            vetAdministered,
+            comments
+        )
+
+        await this.repository.registerVaccinesAdministered(vaccineAdministered.vaccineAdministeredModel)
+    }
+
+    async registerPetExam(dto: CreatePetExamDto): Promise<void> {
+        const { petId, exameId, datePerformed, vetPerformed, contactVet, results, comments } = dto
+
+        const id = randomUUID();
+
+        const [examExist] = await this.repository.findVaccineById(exameId)
+
+        if (!examExist) throw new HttpException("Vaccine id not found", HttpStatus.NOT_FOUND);
+
+        const petExist = await this.repository.findPetById(petId)
+
+        if (!petExist) throw new HttpException("Pet id not found", HttpStatus.NOT_FOUND);
+        
+        const petExam = new PetExam(
+            id,
+            petId,
+            exameId,
+            datePerformed,
+            vetPerformed,
+            contactVet,
+            results,
+            comments
+        )
+
+        await this.repository.registerPetExamm(petExam.petExamModel)
     }
 }

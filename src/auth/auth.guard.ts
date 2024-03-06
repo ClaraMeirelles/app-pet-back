@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     CanActivate,
     ExecutionContext,
     Injectable,
@@ -7,26 +8,38 @@ import {
 import { JwtService } from '@nestjs/jwt';
 //   import { jwtConstants } from './constants';
 import { Request } from 'express';
+import { UsersService } from 'src/entities/users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-    constructor(private jwtService: JwtService) { }
+    constructor(
+        private usersService: UsersService,
+        private jwtService: JwtService
+    ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
+
         if (!token) {
             throw new UnauthorizedException();
         }
+
         try {
             const payload = await this.jwtService.verifyAsync(
                 token,
                 {
-                    secret: process.env.JWT_SECRET
-                }
+                    secret: process.env.JWT_SECRET,
+                    ignoreExpiration: false
+                },
             );
-            // 💡 We're assigning the payload to the request object here
-            // so that we can access it in our route handlers
+
+            const userExist = await this.usersService.findUserByEmail(payload.email)
+
+            if (!userExist) {
+                throw new UnauthorizedException();
+            };
+
             request['user'] = payload;
         } catch {
             throw new UnauthorizedException();
