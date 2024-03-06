@@ -34,7 +34,7 @@ export class AuthService {
             throw new BadRequestException("Something bad happened", { cause: new Error(), description: "Email or Password invalid" });
         };
 
-        const { name, email, password, role, address, phoneNumber, profilePicture, description, lastLogin, status, preferences, petsCount } = signupUserInput;
+        const { name, email, password, role, address, phoneNumber, profilePicture, description, lastLogin, status, preferences } = signupUserInput;
 
         let createdAt = new Date().toISOString();
 
@@ -56,7 +56,7 @@ export class AuthService {
             lastLogin,
             status,
             preferences,
-            petsCount
+            0
         );
 
         const userCreated = await this.usersService.signup(newUserDB.userModel)

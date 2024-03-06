@@ -58,7 +58,4 @@ export class CreateUserDto {
   @IsString({ message: 'Preferences must be a string' })
   preferences: string;
 
-  @IsNotEmpty({ message: 'Pets count is empty' })
-  @IsInt({ message: 'Pets count must be an integer' })
-  petsCount: number;
 }
